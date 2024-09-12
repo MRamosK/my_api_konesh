@@ -1,0 +1,10 @@
+import os
+from typing import Any
+
+class Config:
+    """
+    Configuration class for the Flask application.
+    """
+    SECRET_KEY: str = os.environ.get('SECRET_KEY') or ''
+    SQLALCHEMY_DATABASE_URI: str = os.environ.get('DATABASE_URL') or 'mysql+mysqlconnector://root:@localhost/users'
+    SQLALCHEMY_TRACK_MODIFICATIONS: bool = False

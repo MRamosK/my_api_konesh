@@ -1,0 +1,124 @@
+from datetime import datetime, timedelta
+from sqlalchemy import func
+from app.modules.modules import CFDRecepcion, CFDRecepcionCR, db
+
+# Utility functions
+def calculate_deadline(minutes: int) -> datetime:
+    """
+    Calculate the deadline by subtracting the given minutes from the current time.
+
+    Args:
+        minutes (int): Number of minutes to subtract.
+
+    Returns:
+        datetime: The calculated deadline.
+    """
+    return datetime.now() - timedelta(minutes=minutes)
+
+
+# Data Access Layer (DAL)
+class CFDIRepository:
+    """
+    Repository for accessing CFDI-related data from the database.
+    """
+
+    @staticmethod
+    def fetch_pending_cfd_count(fecha_limite: datetime) -> int:
+        """
+        Fetch the count of pending CFDIs based on a deadline.
+
+        Args:
+            fecha_limite (datetime): The deadline to compare CFDIs against.
+
+        Returns:
+            int: The count of pending CFDIs.
+        """
+        return db.session.query(func.count(CFDRecepcion.idfactura)).filter(
+            CFDRecepcion.estado_envio_sat == None,
+            CFDRecepcion.fecha_recepcion < fecha_limite
+        ).with_hint(CFDRecepcion, 'FORCE INDEX(IDX_ESTADO_ENVIO_SAT)').scalar()
+
+    @staticmethod
+    def fetch_extemporaneous_cfd_count(fecha_limite: datetime) -> int:
+        """
+        Fetch the count of extemporaneous CFDIs based on a deadline.
+
+        Args:
+            fecha_limite (datetime): The deadline to compare CFDIs against.
+
+        Returns:
+            int: The count of extemporaneous CFDIs.
+        """
+        return db.session.query(func.count(CFDRecepcion.idfactura)).filter(
+            CFDRecepcion.estado_envio_sat == 'Comprobante recibido extemporáneamente',
+            CFDRecepcion.fecha_recepcion >= fecha_limite
+        ).with_hint(CFDRecepcion, 'FORCE INDEX(IDX_ESTADO_ENVIO_SAT)').scalar()
+
+    @staticmethod
+    def fetch_incidents_cfd_count(fecha_limite: datetime) -> int:
+        """
+        Fetch the count of CFDIs with incidents based on a deadline.
+
+        Args:
+            fecha_limite (datetime): The deadline to compare CFDIs against.
+
+        Returns:
+            int: The count of CFDIs with incidents.
+        """
+        return db.session.query(func.count(CFDRecepcion.idfactura)).filter(
+            CFDRecepcion.estado_envio_sat == 'Comprobante recibido con incidencias',
+            CFDRecepcion.fecha_recepcion >= fecha_limite
+        ).with_hint(CFDRecepcion, 'FORCE INDEX(IDX_ESTADO_ENVIO_SAT)').scalar()
+
+    @staticmethod
+    def fetch_rejected_cfd_count() -> int:
+        """
+        Fetch the count of rejected CFDIs.
+
+        Returns:
+            int: The count of rejected CFDIs.
+        """
+        return db.session.query(func.count(CFDRecepcion.idfactura)).filter(
+            CFDRecepcion.estado_envio_sat == 'Comprobante rechazado'
+        ).with_hint(CFDRecepcion, 'FORCE INDEX(IDX_ESTADO_ENVIO_SAT)').scalar()
+
+    @staticmethod
+    def fetch_peding_cancellation_cr_count() -> int:
+        """
+        Fetch the count of CRs pending cancellation.
+
+        Returns:
+            int: The count of CRs pending cancellation.
+        """
+        return db.session.query(func.count(CFDRecepcionCR.id)).filter(
+            CFDRecepcionCR.cancelado.in_([-1, -2])
+        ).scalar()
+
+    @staticmethod
+    def fetch_cancellation_error_cr_count() -> int:
+        """
+        Fetch the count of CRs with cancellation errors.
+
+        Returns:
+            int: The count of CRs with cancellation errors.
+        """
+        return db.session.query(func.count(CFDRecepcionCR.id)).filter(
+            CFDRecepcionCR.cancelado.in_([1308]),
+            CFDRecepcionCR.fecha_cancelacion >= "2024-01-01 00:00:00"
+        ).scalar()
+
+    @staticmethod
+    def fetch_status_cr_count(fecha_limite: datetime) -> int:
+        """
+        Fetch the count of CRs with pending status based on a deadline.
+
+        Args:
+            fecha_limite (datetime): The deadline to compare CRs against.
+
+        Returns:
+            int: The count of CRs with pending status.
+        """
+        return db.session.query(func.count(CFDRecepcionCR.id)).filter(
+            CFDRecepcionCR.estado_envio_sat == None,
+            CFDRecepcionCR.fecha_recepcion <= fecha_limite
+        ).scalar()

@@ -1,0 +1,123 @@
+from . import main
+from flask import Blueprint, request, jsonify
+from app.services.cfdi_status_service import CFDIStatusService
+from app.repositories.cfdi_repository import CFDIRepository
+
+main = Blueprint('cfd_recepcion', __name__)
+
+# API Route
+@main.route('/cfdi/status', methods=['GET'])
+def get_cfdi_status():
+    """
+    API endpoint to get CFDI status.
+
+    Returns:
+        str: JSON response containing the CFDI status.
+    """
+    minutes_status = int(request.args.get('minutes_status', 10))
+    minutes_extemporaneos = int(request.args.get('minutes_extemporaneos', 10))
+    minutes_incidents = int(request.args.get('minutes_incidents', 10))
+    minutes_cr = int(request.args.get('minutes_cr', 10))
+    minutes_cr_cancellation = int(request.args.get('minutes_cr_cancellation', 10))
+
+    service = CFDIStatusService(CFDIRepository())
+    response = service.get_cfd_status(minutes_status, minutes_extemporaneos, minutes_incidents,
+                                      minutes_cr, minutes_cr_cancellation)
+    return jsonify(response)
+
+
+
+
+
+
+# @main.route('/users/<int:id>', methods=['GET'])
+# def get_user(id):
+#     """
+#     Get a user by ID.
+
+#     Args:
+#         id (int): User ID.
+
+#     Returns:
+#         str: JSON response containing user data.
+#     """
+#     user = User.query.get_or_404(id)
+#     return jsonify(user_schema.dump(user))
+
+# @main.route('/users', methods=['POST'])
+# def create_user():
+#     """Crear un nuevo usuario"""
+#     data = request.get_json()
+#     try:
+#         # Cargar y validar los datos usando el esquema
+#         user_data = user_schema.load(data)
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), 400
+
+#     # Crear una instancia del modelo User con los datos validados
+#     new_user = User(user_name=user_data['user_name'], email=user_data['email'])
+#     db.session.add(new_user)
+#     db.session.commit()
+#     return jsonify(user_schema.dump(new_user)), 201
+
+# @main.route('/users/<int:id>', methods=['PUT'])
+# def update_user(id: int) -> str:
+#     """
+#     Update an existing user.
+
+#     Args:
+#         id (int): User ID.
+
+#     Returns:
+#         str: JSON response containing the updated user.
+#     """
+#     user = User.query.get_or_404(id)
+#     data = request.get_json()
+#     try:
+#         user_data = user_schema.load(data)  # Validar los datos con el esquema
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), 400
+
+#     # Actualizar el usuario con los datos validados
+#     user.user_name = user_data.get('user_name', user.user_name)
+#     user.email = user_data.get('email', user.email)
+#     db.session.commit()
+#     return jsonify(user_schema.dump(user))
+
+
+# @main.route('/users/<int:id>', methods=['DELETE'])
+# def delete_user(id: int) -> str:
+#     """
+#     Delete a user by ID.
+
+#     Args:
+#         id (int): User ID.
+
+#     Returns:
+#         str: JSON response indicating success.
+#     """
+#     user = User.query.get_or_404(id)
+#     db.session.delete(user)
+#     db.session.commit()
+#     return jsonify({'message': 'User deleted successfully'})
+
+
+# @main.route('/login')
+# def login() -> str:
+#     """
+#     Route for the user login page.
+
+#     Returns:
+#         str: The rendered template for the user login page.
+#     """
+#     return render_template('users/login.html')
+
+# @main.route('/signup')
+# def signup() -> str:
+#     """
+#     Route for the user signup page.
+
+#     Returns:
+#         str: The rendered template for the user signup page.
+#     """
+#     return render_template('users/sign_up.html')

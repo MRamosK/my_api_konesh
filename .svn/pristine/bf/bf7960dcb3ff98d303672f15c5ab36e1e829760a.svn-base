@@ -1,0 +1,149 @@
+from . import main
+from flask import render_template
+from flask import Blueprint, request, jsonify
+from sqlalchemy import func
+from datetime import datetime, timedelta
+from app import db
+from app.modules.cfd_recepcion import CFDRecepcion
+from app.schemas.cfd_recepcion import CFDRecepcionSchema
+
+main = Blueprint('cfd_recepcion', __name__)
+cfd_recepcion_schema = CFDRecepcionSchema()
+cfds_recepcion_schema = CFDRecepcionSchema(many=True)
+
+@main.route('/cfd/status', methods=['GET'])
+def get_cfd_status():
+    """
+    Endpoint to get the status of CFD_RECEPCION records where ESTADO_ENVIO_SAT is NULL 
+    and FECHA_RECEPCION is before a calculated date.
+    
+    Query Parameters:
+        minutes (int): Number of minutes to subtract from the current time.
+    
+    Returns:
+        JSON: A JSON object with the status and count of CFD records.
+    """
+    # Obtener el parámetro 'minutes' de la solicitud
+    minutes = request.args.get('minutes', default=0, type=int)
+
+    # Calcular la fecha límite restando los minutos a la fecha actual
+    fecha_limite = datetime.now() - timedelta(minutes=minutes)
+
+    fecha_limite_str = fecha_limite.strftime("%Y-%m-%d %H:%M:%S")
+
+    # Realizar la consulta usando el ORM
+    count_result = db.session.query(func.count(CFDRecepcion.idfactura)).filter(
+        CFDRecepcion.estado_envio_sat == None,
+        CFDRecepcion.fecha_recepcion < fecha_limite_str
+    ).with_hint(CFDRecepcion, 'FORCE INDEX(IDX_ESTADO_ENVIO_SAT)').scalar()
+
+    # Determinar el estatus basado en el conteo
+    if count_result > 0:
+        cfdi_status = "EXISTEN_PENDIENTES_CFDI"
+    else:
+        cfdi_status = "ENVIOS_CFDI_OK"
+
+    # Crear la estructura JSON deseada
+    response = {
+        "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "CFDI": [
+            {
+                "CFDI_ESTATUS": cfdi_status,
+                "CANTIDAD": str(count_result)
+            }
+        ]
+    }
+
+    return jsonify(response)
+
+# @main.route('/users/<int:id>', methods=['GET'])
+# def get_user(id):
+#     """
+#     Get a user by ID.
+
+#     Args:
+#         id (int): User ID.
+
+#     Returns:
+#         str: JSON response containing user data.
+#     """
+#     user = User.query.get_or_404(id)
+#     return jsonify(user_schema.dump(user))
+
+# @main.route('/users', methods=['POST'])
+# def create_user():
+#     """Crear un nuevo usuario"""
+#     data = request.get_json()
+#     try:
+#         # Cargar y validar los datos usando el esquema
+#         user_data = user_schema.load(data)
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), 400
+
+#     # Crear una instancia del modelo User con los datos validados
+#     new_user = User(user_name=user_data['user_name'], email=user_data['email'])
+#     db.session.add(new_user)
+#     db.session.commit()
+#     return jsonify(user_schema.dump(new_user)), 201
+
+# @main.route('/users/<int:id>', methods=['PUT'])
+# def update_user(id: int) -> str:
+#     """
+#     Update an existing user.
+
+#     Args:
+#         id (int): User ID.
+
+#     Returns:
+#         str: JSON response containing the updated user.
+#     """
+#     user = User.query.get_or_404(id)
+#     data = request.get_json()
+#     try:
+#         user_data = user_schema.load(data)  # Validar los datos con el esquema
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), 400
+
+#     # Actualizar el usuario con los datos validados
+#     user.user_name = user_data.get('user_name', user.user_name)
+#     user.email = user_data.get('email', user.email)
+#     db.session.commit()
+#     return jsonify(user_schema.dump(user))
+
+
+# @main.route('/users/<int:id>', methods=['DELETE'])
+# def delete_user(id: int) -> str:
+#     """
+#     Delete a user by ID.
+
+#     Args:
+#         id (int): User ID.
+
+#     Returns:
+#         str: JSON response indicating success.
+#     """
+#     user = User.query.get_or_404(id)
+#     db.session.delete(user)
+#     db.session.commit()
+#     return jsonify({'message': 'User deleted successfully'})
+
+
+# @main.route('/login')
+# def login() -> str:
+#     """
+#     Route for the user login page.
+
+#     Returns:
+#         str: The rendered template for the user login page.
+#     """
+#     return render_template('users/login.html')
+
+# @main.route('/signup')
+# def signup() -> str:
+#     """
+#     Route for the user signup page.
+
+#     Returns:
+#         str: The rendered template for the user signup page.
+#     """
+#     return render_template('users/sign_up.html')

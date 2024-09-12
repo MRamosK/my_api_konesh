@@ -1,0 +1,16 @@
+import os
+from typing import Any
+
+class Config:
+    """
+    Configuration class for the Flask application.
+    """
+    SECRET_KEY: str = os.environ.get('SECRET_KEY') or ""
+    DB_USER = os.environ.get('DB_USER') or 'mramos'
+    DB_PASSWORD = os.environ.get('DB_PASSWORD') or 'TFscXa903$1lrt%d'
+    DB_HOST = os.environ.get('DB_HOST') or '10.10.20.3'
+    DB_NAME = os.environ.get('DB_NAME') or 'cfdi_integradores_timbrador_pruebas'
+    
+    SQLALCHEMY_DATABASE_URI: str = f'mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}'
+    SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
+

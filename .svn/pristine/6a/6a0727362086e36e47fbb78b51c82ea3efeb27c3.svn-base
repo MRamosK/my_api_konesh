@@ -1,0 +1,16 @@
+from . import main
+from flask import render_template
+from flask import Blueprint
+
+main = Blueprint('private', __name__)
+
+@main.route('/private')
+def private_index() -> str:
+    """
+    Route for the private index page.
+
+    Returns:
+        str: The rendered template for the private index page.
+    """
+    return render_template('private/index.html')
+
