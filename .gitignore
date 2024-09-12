@@ -7,4 +7,6 @@ temp/
 # Ignorar entornos virtuales
 env/
 
+config.json
+
 .DS_Store
