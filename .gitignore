@@ -1,0 +1,11 @@
+# Ignorar carpetas de caché de Python
+__pycache__/
+
+# Ignorar archivos de log
+*.log
+
+# Ignorar carpetas temporales
+temp/
+
+# Ignorar entornos virtuales
+env/
