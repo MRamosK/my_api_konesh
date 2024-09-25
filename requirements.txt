@@ -9,3 +9,6 @@ requests
 mysql-connector-python
 flask-marshmallow 
 marshmallow-sqlalchemy
+gunicorn
+Flask-Limiter
+Redis

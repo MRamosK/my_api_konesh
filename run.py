@@ -5,4 +5,4 @@ app = create_app()
 
 if __name__ == '__main__':
     # Ejecutar la aplicación en todas las interfaces de red
-    app.run( port=5000, debug=True)
+    app.run(debug=False,host="0.0.0.0")

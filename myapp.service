@@ -1,0 +1,16 @@
+[Unit]
+Description=Gunicorn instance to serve my Flask app
+After=network.target
+
+[Service]
+User=tu_usuario       # El usuario que ejecutará la app
+Group=www-data        # Grupo, normalmente 'www-data' o el que desees
+WorkingDirectory=/ruta/a/tu_proyecto  # Ruta completa a tu app Flask
+ExecStart=/ruta/a/tu_proyecto/env/bin/gunicorn --workers 3 --threads 2 --bind 0.0.0.0:5050 run:app
+Restart=always        # Para que se reinicie automáticamente en caso de fallo
+MemoryLimit=500M  # Limitar el uso de memoria a 500 MB
+CPUQuota=10%  # Limitar el uso del CPU a un 10%
+
+
+[Install]
+WantedBy=multi-user.target

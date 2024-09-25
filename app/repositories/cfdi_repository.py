@@ -62,7 +62,7 @@ class CFDIRepository:
             CFDRecepcion
         ).filter(
             CFDRecepcion.estado_envio_sat == 'Comprobante recibido extemporáneamente',
-            CFDRecepcion.fecha_recepcion <=  func.date_sub(func.now(), text(f"INTERVAL {subquery} MINUTE"))
+            CFDRecepcion.fecha_recepcion >=  func.date_sub(func.now(), text(f"INTERVAL {subquery} MINUTE"))
         ).with_hint(CFDRecepcion, 'FORCE INDEX (IDX_FECHA_RECEP_ESTADO_ENVIO_SAT)', 'mysql')
 
         # Execute the query and return the result
