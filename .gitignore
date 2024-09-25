@@ -6,6 +6,7 @@ __pycache__/
 temp/
 # Ignorar entornos virtuales
 env/
+.env/
 
 config.json
 .DS_Store
