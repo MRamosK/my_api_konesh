@@ -1,14 +1,11 @@
 from flask import Flask
 from .routes.cfd_recepcion import main as cfd_recepcion
 from app.modules.modules import db
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 def create_app() -> Flask:
     app = Flask(__name__)
     app.config.from_object('config.Config')
     
-
     
     db.init_app(app)
     
