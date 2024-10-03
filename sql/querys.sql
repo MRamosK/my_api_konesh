@@ -24,7 +24,7 @@ select * from parametro p where p.NOMBRE = "cr_cancelacion_error";
 -- Selects para datos --
 
 -- CFDI tiempo
-select count(*) from cfd_recepcion cfd force index(IDX_ESTADO_ENVIO_SAT) where cfd.ESTADO_ENVIO_SAT 
+explain select count(*) from cfd_recepcion cfd force index(IDX_ESTADO_ENVIO_SAT) where cfd.ESTADO_ENVIO_SAT 
 is null and cfd.FECHA_RECEPCION <= DATE_SUB(NOW(), INTERVAL 
 (SELECT valor FROM parametro  WHERE nombre = "cfdi_status") MINUTE);
 
@@ -36,7 +36,10 @@ WHERE ESTADO_ENVIO_SAT = 'Comprobante rechazado';
 -- CFDI_EXTEMPORANEOS *tiempo
 select count(*) from cfd_recepcion cfd force index(IDX_FECHA_RECEP_ESTADO_ENVIO_SAT) 
 WHERE cfd.ESTADO_ENVIO_SAT = 'Comprobante recibido extemporáneamente' AND 
-cfd.FECHA_RECEPCION <= date_sub(now(), interval (select valor from parametro where nombre = "cfdi_extemporaneo") minute);
+cfd.FECHA_RECEPCION >= date_sub(now(), interval (select valor from parametro where nombre = "cfdi_extemporaneo") minute);
+
+SELECT COUNT(*)  FROM cfd_recepcion cfd  FORCE INDEX(IDX_FECHA_RECEP_ESTADO_ENVIO_SAT)   WHERE cfd.ESTADO_ENVIO_SAT = 'Comprobante recibido extemporáneamente'   AND cfd.FECHA_RECEPCION >= DATE_SUB(NOW(), INTERVAL (select valor from parametro where id=101211202) MINUTE);
+
 
 -- CFDI_INCIDENCIAS fecha
 select count(*) from cfd_recepcion cfd force index(IDX_FECHA_RECEP_ESTADO_ENVIO_SAT)
