@@ -2,10 +2,11 @@ from . import main
 from flask import Blueprint, jsonify # type: ignore
 from app.services.cfdi_status_service import CFDIStatusService
 from app.repositories.cfdi_repository import CFDIRepository
+from datetime import datetime
 
 main = Blueprint('cfd_recepcion', __name__)
 
-# API Route
+# API Route for CFDI status
 @main.route('/cfdi/status', methods=['GET'])
 def get_cfdi_status():
     """
@@ -14,11 +15,88 @@ def get_cfdi_status():
     Returns:
         str: JSON response containing the CFDI status.
     """
-
     service = CFDIStatusService(CFDIRepository())
-    response = service.get_cfd_status()
-    
+    response = service.build_cfdi_status_json(datetime.now())
     return jsonify(response)
+
+# API Route for CFDI rejected
+@main.route('/cfdi/rejected', methods=['GET'])
+def get_cfdi_rejected():
+    """
+    API endpoint to get rejected CFDIs.
+
+    Returns:
+        str: JSON response containing rejected CFDIs status.
+    """
+    service = CFDIStatusService(CFDIRepository())
+    response = service.build_cfdi_rechazados_json(datetime.now())
+    return jsonify(response)
+
+# API Route for CFDI extemporaneous
+@main.route('/cfdi/extemporaneous', methods=['GET'])
+def get_cfdi_extemporaneous():
+    """
+    API endpoint to get extemporaneous CFDIs.
+
+    Returns:
+        str: JSON response containing extemporaneous CFDIs status.
+    """
+    service = CFDIStatusService(CFDIRepository())
+    response = service.build_cfdi_extemporaneos_json(datetime.now())
+    return jsonify(response)
+
+# API Route for CFDI incidents
+@main.route('/cfdi/incidents', methods=['GET'])
+def get_cfdi_incidents():
+    """
+    API endpoint to get CFDI incidents.
+
+    Returns:
+        str: JSON response containing CFDI incidents status.
+    """
+    service = CFDIStatusService(CFDIRepository())
+    response = service.build_cfdi_incidencias_json(datetime.now())
+    return jsonify(response)
+
+# API Route for CR status
+@main.route('/cr/status', methods=['GET'])
+def get_cr_status():
+    """
+    API endpoint to get CR status.
+
+    Returns:
+        str: JSON response containing CR status.
+    """
+    service = CFDIStatusService(CFDIRepository())
+    response = service.build_cr_status_json(datetime.now())
+    return jsonify(response)
+
+# API Route for CR pending cancellations
+@main.route('/cr/cancellations/pending', methods=['GET'])
+def get_cr_pending_cancellations():
+    """
+    API endpoint to get pending CR cancellations.
+
+    Returns:
+        str: JSON response containing CR pending cancellations status.
+    """
+    service = CFDIStatusService(CFDIRepository())
+    response = service.build_cr_pendientes_json(datetime.now())
+    return jsonify(response)
+
+# API Route for CR cancellation errors
+@main.route('/cr/cancellations/errors', methods=['GET'])
+def get_cr_cancellation_errors():
+    """
+    API endpoint to get CR cancellation errors.
+
+    Returns:
+        str: JSON response containing CR cancellation errors status.
+    """
+    service = CFDIStatusService(CFDIRepository())
+    response = service.build_cr_cancelacion_error_json(datetime.now())
+    return jsonify(response)
+
 
 
 
