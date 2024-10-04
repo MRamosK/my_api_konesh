@@ -52,7 +52,7 @@ class CFDIRepository:
         subquery =  (
             db.session.query(func.coalesce(
                 db.session.query(Parametros.valor)
-                .filter(Parametros.nombre == "cfdi_extemporaneo")
+                .filter(Parametros.id == 101211202)
                 .scalar_subquery(), 0)
             )
         ).scalar()
@@ -79,7 +79,7 @@ class CFDIRepository:
             int: The count of CFDIs with incidents.
         """
         # Subquery to get the value from the parametro table
-        subquery = db.session.query(Parametros.valor).filter(Parametros.nombre == "cfdi_incidentes").scalar_subquery()
+        subquery = db.session.query(Parametros.valor).filter(Parametros.id == 101211203).scalar_subquery()
 
 
         # Main query to count the relevant records in the cfd_recepcion table
