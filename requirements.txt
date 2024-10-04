@@ -12,3 +12,5 @@ marshmallow-sqlalchemy
 gunicorn
 Flask-Limiter
 Redis
+Flask-JWT-Extended
+Flask-HTTPAuth

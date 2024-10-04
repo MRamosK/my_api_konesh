@@ -3,11 +3,26 @@ from flask import Blueprint, jsonify # type: ignore
 from app.services.cfdi_status_service import CFDIStatusService
 from app.repositories.cfdi_repository import CFDIRepository
 from datetime import datetime
+from flask_httpauth import HTTPBasicAuth
+
 
 main = Blueprint('cfd_recepcion', __name__)
+auth = HTTPBasicAuth()
+
+# Usuarios autorizados (puedes cambiar esto para obtener los usuarios de una base de datos si es necesario)
+users = {
+    "site_monitor": "monitorpassword123"
+}
+
+@auth.verify_password
+def verify_password(username, password):
+    if username in users and users[username] == password:
+        return username
+    return None
 
 # API Route for CFDI status
 @main.route('/cfdi/status', methods=['GET'])
+@auth.login_required  # Proteger esta ruta con autenticación básica
 def get_cfdi_status():
     """
     API endpoint to get CFDI status.
@@ -21,6 +36,7 @@ def get_cfdi_status():
 
 # API Route for CFDI rejected
 @main.route('/cfdi/rejected', methods=['GET'])
+@auth.login_required 
 def get_cfdi_rejected():
     """
     API endpoint to get rejected CFDIs.
@@ -34,6 +50,7 @@ def get_cfdi_rejected():
 
 # API Route for CFDI extemporaneous
 @main.route('/cfdi/extemporaneous', methods=['GET'])
+@auth.login_required 
 def get_cfdi_extemporaneous():
     """
     API endpoint to get extemporaneous CFDIs.
@@ -47,6 +64,7 @@ def get_cfdi_extemporaneous():
 
 # API Route for CFDI incidents
 @main.route('/cfdi/incidents', methods=['GET'])
+@auth.login_required 
 def get_cfdi_incidents():
     """
     API endpoint to get CFDI incidents.
@@ -60,6 +78,7 @@ def get_cfdi_incidents():
 
 # API Route for CR status
 @main.route('/cr/status', methods=['GET'])
+@auth.login_required 
 def get_cr_status():
     """
     API endpoint to get CR status.
@@ -73,8 +92,10 @@ def get_cr_status():
 
 # API Route for CR pending cancellations
 @main.route('/cr/cancellations/pending', methods=['GET'])
+@auth.login_required 
 def get_cr_pending_cancellations():
     """
+    
     API endpoint to get pending CR cancellations.
 
     Returns:
@@ -86,6 +107,7 @@ def get_cr_pending_cancellations():
 
 # API Route for CR cancellation errors
 @main.route('/cr/cancellations/errors', methods=['GET'])
+@auth.login_required 
 def get_cr_cancellation_errors():
     """
     API endpoint to get CR cancellation errors.

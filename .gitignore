@@ -7,6 +7,8 @@ temp/
 # Ignorar entornos virtuales
 env/
 .env/
-
+# credentials
+.key
+.crt
 config.json
 .DS_Store
